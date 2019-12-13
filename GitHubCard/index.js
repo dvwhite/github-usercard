@@ -93,6 +93,15 @@ function createAndPushElement(elementStr, elementText, arrToPushTo) {
   arrToPushTo.push(element);
 }
 
+/*
+* Append all child nodes to the parent node
+* @param {Array} children: The array of child nodes
+* @param {object} parent: The parent node to append to
+*/
+function appendChildren(children, parent) {
+  children.forEach(child => parent.appendNode(child));
+}
+
 
   //////////////////////
  //    Components    //
@@ -171,6 +180,9 @@ function createCard(cardObj) {
 
   // Create the component HTML
   const outerDivChildren = [];
+  const innerDivChildren = [];
+
+  // Outer div
   const outerDiv = document.createElement('div');
   outerDiv.classList.add('card');
 
@@ -187,15 +199,32 @@ function createCard(cardObj) {
   // h3
   const nameHeading = createElementWithText('h3', name);
   nameHeading.classList.add('name');
-  outerDivChildren.push(nameHeading);
+  innerDivChildren.push(nameHeading);
 
   // p: username
   const pUsername = createElementWithText('p', username);
   pUsername.classList.add('username');
-  outerDivChildren.push(pUsername);
+  innerDivChildren.push(pUsername);
 
   // p: location
-  createAndPushElement('p', `Location: ${location}`, outerDivChildren);
+  createAndPushElement('p', `Location: ${location}`, innerDivChildren);
 
+  // p: profile
+  const pProfile = createElementWithText('p', 'Profile:');
+  const aProfile = createElementWithText('a', githubURL);
+  aProfile.setAttribute('href', githubURL);
+  pProfile.appendChild(aProfile);
+  innerDivChildren.push(pProfile);
+
+  // p: followers
+  createAndPushElement('p', `Followers: ${followers}`, innerDivChildren);
+
+  // p: following
+  createAndPushElement('p', `Following: ${following}`, innerDivChildren);
+  
+  // p: bio
+  createAndPushElement('p', `Bio: ${bio}`, innerDivChildren);
+
+  appendChildren(innerDivChildren, innerDiv);
 
 }
