@@ -201,6 +201,11 @@ function getGithubUserData(apiURL) {
   return axios.get(apiURL);
 }
 
+/*
+* Get GitHub user card using data from the GitHub API
+* @param {string} apiURL: The github api URL
+* @param {object} destination: The destination to add card to
+*/
 function addGitHubUserCard(apiURL, destination) {
   getGithubUserData(apiURL)
   .then(response => {
