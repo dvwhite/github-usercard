@@ -24,6 +24,7 @@
           user, and adding that card to the DOM.
 */
 
+// Globals
 const followersArray = [];
 
 /* Step 3: Create a function that accepts a single object as its only argument,
@@ -76,7 +77,7 @@ function createElementWithText(elementStr, elementText) {
 * A generic element component that sets the textContent after creation
 * @param {string} elementStr: The string defining the element to create
 * @param {string} elementText: The text to set as the element.textContent
-* @param {string} arrToPushTo: The array to push the element to
+* @param {Array} arrToPushTo: The array to push the element to
 * @returns: none
 */
 function createAndPushElement(elementStr, elementText, arrToPushTo) {
@@ -161,10 +162,20 @@ function createCard(data) {
   // p: bio
   createAndPushElement('p', `Bio: ${bio}`, innerDivChildren);
 
+  // Stretch: contribution graph
+  const graphDiv = document.createElement('div');
+  graphDiv.classList.add('calendar');
+  graphDiv.style.width = 'auto';
+  graphDiv.id = 'calendar';
+  innerDivChildren.push(graphDiv);
+  outerDiv.style.width = '1045px'; // An ideal width for the graph
+
+  // Call the github calendar library function
+  GitHubCalendar('#calendar', username);
+
   // Append child nodes to their destination parent nodes
   appendChildren(innerDivChildren, innerDiv);
   appendChildren(outerDivChildren, outerDiv);
-
   return outerDiv;
 }
 
@@ -175,7 +186,20 @@ function createCard(data) {
 * @returns: none
 */
 function createAndAppendCard(cardData, cardsDiv) {
-  cardsDiv.appendChild(createCard(cardData));
+  const newCard = createCard(cardData);
+  cardsDiv.appendChild(newCard);
+
+  // Remove the calendar id from the previous card
+  // if necessary
+  cardsArr = Array.from(cardsDiv.childNodes);
+  cardIdx = cardsArr.indexOf(newCard);
+  console.log(cardsArr, cardIdx)
+  if (cardIdx > 0) {
+    const cardToModify = cardsArr[cardIdx - 1]
+    if (cardToModify.id =='#calendar') {
+      cardToModify.removeAttribute('id');
+    }
+  }
 }
 
 /*
@@ -221,7 +245,7 @@ function addGitHubUserCard(apiURL, destination) {
 const ghBaseAPIURL = 'https://api.github.com/users/';
 const initialUser = 'dvwhite';
 const ghAPIURL = ghBaseAPIURL + initialUser;
-axios.get(ghAPIURL)
+getGithubUserData(ghAPIURL)
   .then(response => {
     // Add profile card for the user
     const cardData = response.data;
@@ -237,5 +261,5 @@ axios.get(ghAPIURL)
     createAndAppendFollowerCards(followersResponse, cardsDiv, ghBaseAPIURL);
   })
   .catch(err => {
-    console.log("Error:", err)
+    console.log("Error:", err);
   });
