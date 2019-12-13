@@ -94,71 +94,16 @@ function appendChildren(children, parent) {
 }
 
 
-  //////////////////////
- //    Components    //
-//////////////////////
-
-
-// {data: {…}, status: 200, statusText: "OK", headers: {…}, config: {…}, …}
-// config: {url: "https://api.github.com/users/dvwhite", method: "get", headers: {…}, transformRequest: Array(1), transformResponse: Array(1), …}
-// data:
-// avatar_url: "https://avatars0.githubusercontent.com/u/47503507?v=4"
-// bio: null
-// blog: ""
-// company: null
-// created_at: "2019-02-10T17:26:54Z"
-// email: null
-// events_url: "https://api.github.com/users/dvwhite/events{/privacy}"
-// followers: 25
-// followers_url: "https://api.github.com/users/dvwhite/followers"
-// following: 29
-// following_url: "https://api.github.com/users/dvwhite/following{/other_user}"
-// gists_url: "https://api.github.com/users/dvwhite/gists{/gist_id}"
-// gravatar_id: ""
-// hireable: null
-// html_url: "https://github.com/dvwhite"
-// id: 47503507
-// location: "Charlottesville, VA"
-// login: "dvwhite"
-// name: "David White"
-// node_id: "MDQ6VXNlcjQ3NTAzNTA3"
-// organizations_url: "https://api.github.com/users/dvwhite/orgs"
-// public_gists: 0
-// public_repos: 22
-// received_events_url: "https://api.github.com/users/dvwhite/received_events"
-// repos_url: "https://api.github.com/users/dvwhite/repos"
-// site_admin: false
-// starred_url: "https://api.github.com/users/dvwhite/starred{/owner}{/repo}"
-// subscriptions_url: "https://api.github.com/users/dvwhite/subscriptions"
-// type: "User"
-// updated_at: "2019-12-12T03:04:04Z"
-// url: "https://api.github.com/users/dvwhite"}
-
-
-//  <div class="card">
-//   <img src={image url of user} />
-//   <div class="card-info">
-//     <h3 class="name">{users name}</h3>
-//     <p class="username">{users user name}</p>
-//     <p>Location: {users location}</p>
-//     <p>Profile:  
-//       <a href={address to users github page}>{address to users github page}</a>
-//     </p>
-//     <p>Followers: {users followers count}</p>
-//     <p>Following: {users following count}</p>
-//     <p>Bio: {users bio}</p>
-//   </div>
-// </div>
-
+  ////////////////////////////
+ //    Components / API    //
+////////////////////////////
 
 /*
 * Create a card component intended for adding to the DOM
 * @param {object} cardObj: The object containing data used to create the card
 * @returns {object} card: The card created by the function
 */
-function createCard(cardObj) {
-  const data = cardObj.data;
-  
+function createCard(data) {
   // Profile data
   const avatarImgURL = data.avatar_url;
   const name = data.name;
@@ -223,11 +168,68 @@ function createCard(cardObj) {
   return outerDiv;
 }
 
-// Get and use API data
-axios.get('https://api.github.com/users/dvwhite')
+/*
+* Creates a card using the card data and appends it to cards div
+* @param {object} cardData: The data used to create the card
+* @param {object} cardsDiv: The parent div to append the new card to
+* @returns: none
+*/
+function createAndAppendCard(cardData, cardsDiv) {
+  cardsDiv.appendChild(createCard(cardData));
+}
+
+/*
+* Create cards and append them to the destination element
+* @param {object} cardsObj: The object with children to add to the parent node
+* @param {object} destination: The parent node to append to 
+* @returns: none
+*/
+function createAndAppendFollowerCards(cardsObj, destination, apiURL) {
+  const cards = cardsObj.data;
+  cards.forEach(card => {
+    userLogin = card.login;
+    userAPIURL = apiURL + userLogin;
+    addGitHubUserCard(userAPIURL, destination);
+  });
+}
+
+/*
+* Get GitHub user data using the GitHub API
+* @param {string} apiURL: The github api URL
+*/
+function getGithubUserData(apiURL) {
+  return axios.get(apiURL);
+}
+
+function addGitHubUserCard(apiURL, destination) {
+  getGithubUserData(apiURL)
   .then(response => {
-    const cards = document.querySelector('.cards');
-    cards.appendChild(createCard(response));
+    const cardData = response.data;
+    createAndAppendCard(cardData, destination, apiURL)
+  })
+  .catch(err => {
+    console.log("Error:", err)
+  });
+}
+
+// Get and use API data
+const ghBaseAPIURL = 'https://api.github.com/users/';
+const initialUser = 'dvwhite';
+const ghAPIURL = ghBaseAPIURL + initialUser;
+axios.get(ghAPIURL)
+  .then(response => {
+    // Add profile card for the user
+    const cardData = response.data;
+    const cardsDiv = document.querySelector('.cards');
+    createAndAppendCard(cardData, cardsDiv, ghAPIURL);
+
+    // Get cards for each of the user's followers
+    const followersURL = response.data.followers_url;
+    return axios.get(followersURL);
+  })
+  .then(followersResponse => {
+    const cardsDiv = document.querySelector('.cards');
+    createAndAppendFollowerCards(followersResponse, cardsDiv, ghBaseAPIURL);
   })
   .catch(err => {
     console.log("Error:", err)
