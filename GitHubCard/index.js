@@ -54,15 +54,6 @@ const followersArray = [];
   bigknell
 */
 
-axios.get('https://api.github.com/users/dvwhite')
-  .then(response => {
-    console.log(response)
-  })
-  .catch(err => {
-    console.log("Error:", err)
-  });
-
-
   //////////////////////
  // Helper functions //
 //////////////////////
@@ -99,7 +90,7 @@ function createAndPushElement(elementStr, elementText, arrToPushTo) {
 * @param {object} parent: The parent node to append to
 */
 function appendChildren(children, parent) {
-  children.forEach(child => parent.appendNode(child));
+  children.forEach(child => parent.appendChild(child));
 }
 
 
@@ -225,6 +216,19 @@ function createCard(cardObj) {
   // p: bio
   createAndPushElement('p', `Bio: ${bio}`, innerDivChildren);
 
+  // Append child nodes to their destination parent nodes
   appendChildren(innerDivChildren, innerDiv);
+  appendChildren(outerDivChildren, outerDiv);
 
+  return outerDiv;
 }
+
+// Get and use API data
+axios.get('https://api.github.com/users/dvwhite')
+  .then(response => {
+    const cards = document.querySelector('.cards');
+    cards.appendChild(createCard(response));
+  })
+  .catch(err => {
+    console.log("Error:", err)
+  });
