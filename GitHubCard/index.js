@@ -135,7 +135,6 @@ function createCard(data) {
   // Outer div
   const outerDiv = document.createElement('div');
   outerDiv.classList.add('card');
-  outerDiv.style.display = 'flex';
   outerDiv.style.flexDirection = 'column';
 
   // Stretch: The component will have two rows:
@@ -145,20 +144,27 @@ function createCard(data) {
   // Row one
   const firstRowDiv = document.createElement('div');
   firstRowDiv.classList.add('row');
+  firstRowDiv.style.display = 'flex';
   outerDivChildren.push(firstRowDiv);
 
   // Profile div
+  const outerProfileDiv = document.createElement('div');
+  outerProfileDiv.classList.add('card-info');
+  outerProfileDiv.style.display = 'flex'; 
 
   // Avatar img
+  const avatarDiv = document.createElement('div');
   const avatarImg = document.createElement('img');
   avatarImg.setAttribute('src', avatarImgURL);
-  firstRowChildren.push(avatarImg);
+  avatarDiv.appendChild(avatarImg);
+  outerProfileDiv.appendChild(avatarDiv);
 
   // Profile content
   const profileDiv = document.createElement('div');
-  profileDiv.classList.add('card-info');
-  profileDiv.style.display = 'inline-block';
-  firstRowChildren.push(profileDiv);
+  outerProfileDiv.appendChild(profileDiv);
+  profileDiv.style.display = 'flex';
+  profileDiv.style.flexDirection = 'column';
+  firstRowChildren.push(outerProfileDiv);
 
   // h3
   const nameHeading = createElementWithText('h3', name);
@@ -187,7 +193,9 @@ function createCard(data) {
   createAndPushElement('p', `Following: ${following}`, profileDivChildren);
   
   // p: bio
-  createAndPushElement('p', `Bio: ${bio}`, profileDivChildren);
+  const pBio = document.createElement('p');
+  pBio.textContent = `Bio: ${bio}`;
+  profileDivChildren.push(pBio);
 
   // Row two
   const secondRowDiv = document.createElement('div');
@@ -207,15 +215,10 @@ function createCard(data) {
   // graph styles
   graphImg.style.width = '100%';
   graphImg.style.border = '1px solid lightgray';
-  graphDiv.style.paddingTop = '1rem';
+  graphDiv.style. paddingTop = '1rem';
 
   // Append graph
   graphDiv.appendChild(graphImg);
-
-  // Call the github calendar library function
-  // David note: This didnt work for multiple users and only accepted
-  // literals as arguments, so I couldn't use it to pass in variables
-  // GitHubCalendar('#calendar', username);
 
   // Append child nodes to their destination parent nodes
   appendChildren(profileDivChildren, profileDiv);
