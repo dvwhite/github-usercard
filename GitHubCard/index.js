@@ -31,17 +31,24 @@ const followersArray = [];
           Using DOM methods and properties, create a component that will return the following DOM element:
 
 <div class="card">
-  <img src={image url of user} />
-  <div class="card-info">
-    <h3 class="name">{users name}</h3>
-    <p class="username">{users user name}</p>
-    <p>Location: {users location}</p>
-    <p>Profile:  
-      <a href={address to users github page}>{address to users github page}</a>
-    </p>
-    <p>Followers: {users followers count}</p>
-    <p>Following: {users following count}</p>
-    <p>Bio: {users bio}</p>
+  <div class="row">
+    <img src={image url of user} />
+    <div class="card-info">
+      <h3 class="name">{users name}</h3>
+      <p class="username">{users user name}</p>
+      <p>Location: {users location}</p>
+      <p>Profile:  
+        <a href={address to users github page}>{address to users github page}</a>
+      </p>
+      <p>Followers: {users followers count}</p>
+      <p>Following: {users following count}</p>
+      <p>Bio: {users bio}</p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="calendar">
+      <img class="graph" src=""/>
+    </div>
   </div>
 </div>
 
@@ -116,65 +123,104 @@ function createCard(data) {
   const bio = data.bio;
 
   // Create the component HTML
+
+  // Arrays of child nodes
+  // These are pushed as content is created, then later  
+  // appended to the parent node using Array.forEach 
   const outerDivChildren = [];
-  const innerDivChildren = [];
+  const profileDivChildren = [];
+  const firstRowChildren = [];
+  const secondRowChildren = [];
 
   // Outer div
   const outerDiv = document.createElement('div');
   outerDiv.classList.add('card');
+  outerDiv.style.display = 'flex';
+  outerDiv.style.flexDirection = 'column';
+
+  // Stretch: The component will have two rows:
+  // First row will be the profile pic,
+  // Second row will be the graph
+
+  // Row one
+  const firstRowDiv = document.createElement('div');
+  firstRowDiv.classList.add('row');
+  outerDivChildren.push(firstRowDiv);
+
+  // Profile div
 
   // Avatar img
   const avatarImg = document.createElement('img');
   avatarImg.setAttribute('src', avatarImgURL);
-  outerDivChildren.push(avatarImg);
+  firstRowChildren.push(avatarImg);
 
   // Profile content
-  const innerDiv = document.createElement('div');
-  innerDiv.classList.add('card-info');
-  outerDivChildren.push(innerDiv);
+  const profileDiv = document.createElement('div');
+  profileDiv.classList.add('card-info');
+  profileDiv.style.display = 'inline-block';
+  firstRowChildren.push(profileDiv);
 
   // h3
   const nameHeading = createElementWithText('h3', name);
   nameHeading.classList.add('name');
-  innerDivChildren.push(nameHeading);
+  profileDivChildren.push(nameHeading);
 
   // p: username
   const pUsername = createElementWithText('p', username);
   pUsername.classList.add('username');
-  innerDivChildren.push(pUsername);
+  profileDivChildren.push(pUsername);
 
   // p: location
-  createAndPushElement('p', `Location: ${location}`, innerDivChildren);
+  createAndPushElement('p', `Location: ${location}`, profileDivChildren);
 
   // p: profile
   const pProfile = createElementWithText('p', 'Profile:');
   const aProfile = createElementWithText('a', githubURL);
   aProfile.setAttribute('href', githubURL);
   pProfile.appendChild(aProfile);
-  innerDivChildren.push(pProfile);
+  profileDivChildren.push(pProfile);
 
   // p: followers
-  createAndPushElement('p', `Followers: ${followers}`, innerDivChildren);
+  createAndPushElement('p', `Followers: ${followers}`, profileDivChildren);
 
   // p: following
-  createAndPushElement('p', `Following: ${following}`, innerDivChildren);
+  createAndPushElement('p', `Following: ${following}`, profileDivChildren);
   
   // p: bio
-  createAndPushElement('p', `Bio: ${bio}`, innerDivChildren);
+  createAndPushElement('p', `Bio: ${bio}`, profileDivChildren);
+
+  // Row two
+  const secondRowDiv = document.createElement('div');
+  secondRowDiv.classList.add('row');
+  outerDivChildren.push(secondRowDiv);
 
   // Stretch: contribution graph
   const graphDiv = document.createElement('div');
-  graphDiv.classList.add('calendar');
-  graphDiv.style.width = 'auto';
-  graphDiv.id = 'calendar';
-  innerDivChildren.push(graphDiv);
-  outerDiv.style.width = '1045px'; // An ideal width for the graph
+  secondRowChildren.push(graphDiv);
+  // graphDiv.classList.add('calendar');
+
+  // graph properties
+  const graphImg = document.createElement('img');
+  graphImg.src = `http://ghchart.rshah.org/${data.login}`;
+  graphImg.alt = "dvwhite's Github chart";
+
+  // graph styles
+  graphImg.style.width = '100%';
+  graphImg.style.border = '1px solid lightgray';
+  graphDiv.style.paddingTop = '1rem';
+
+  // Append graph
+  graphDiv.appendChild(graphImg);
 
   // Call the github calendar library function
-  GitHubCalendar('#calendar', username);
+  // David note: This didnt work for multiple users and only accepted
+  // literals as arguments, so I couldn't use it to pass in variables
+  // GitHubCalendar('#calendar', username);
 
   // Append child nodes to their destination parent nodes
-  appendChildren(innerDivChildren, innerDiv);
+  appendChildren(profileDivChildren, profileDiv);
+  appendChildren(firstRowChildren, firstRowDiv);
+  appendChildren(secondRowChildren, secondRowDiv);
   appendChildren(outerDivChildren, outerDiv);
   return outerDiv;
 }
@@ -188,18 +234,6 @@ function createCard(data) {
 function createAndAppendCard(cardData, cardsDiv) {
   const newCard = createCard(cardData);
   cardsDiv.appendChild(newCard);
-
-  // Remove the calendar id from the previous card
-  // if necessary
-  cardsArr = Array.from(cardsDiv.childNodes);
-  cardIdx = cardsArr.indexOf(newCard);
-  console.log(cardsArr, cardIdx)
-  if (cardIdx > 0) {
-    const cardToModify = cardsArr[cardIdx - 1]
-    if (cardToModify.id =='#calendar') {
-      cardToModify.removeAttribute('id');
-    }
-  }
 }
 
 /*
