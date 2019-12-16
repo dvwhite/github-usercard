@@ -315,7 +315,7 @@ function formCreator() {
     const user = form.elements.userName.value;
     event.preventDefault();
 
-    githubCards(user)
+    githubCards.call(this, user);
   });
 
   const ul = document.createElement('ul');
