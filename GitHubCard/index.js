@@ -278,25 +278,86 @@ function addGitHubUserCard(apiURL, destination) {
   });
 }
 
-// Get and use API data
-const ghBaseAPIURL = 'https://api.github.com/users/';
-const initialUser = 'dvwhite';
-const ghAPIURL = ghBaseAPIURL + initialUser;
-getGithubUserData(ghAPIURL)
-  .then(response => {
-    // Add profile card for the user
-    const cardData = response.data;
-    const cardsDiv = document.querySelector('.cards');
-    createAndAppendCard(cardData, cardsDiv, ghAPIURL);
+/*
+* Populate the page with github user cards
+* @param {string} initialUser: The first user to send to the API
+* @returns: none
+*/
+function githubCards(initialUser) {
+  // Get and use API data
+  const ghBaseAPIURL = 'https://api.github.com/users/';
+  const ghAPIURL = ghBaseAPIURL + initialUser;
+  getGithubUserData(ghAPIURL)
+    .then(response => {
+      // Add profile card for the user
+      const cardData = response.data;
+      const cardsDiv = document.querySelector('.cards');
+      createAndAppendCard(cardData, cardsDiv, ghAPIURL);
 
-    // Get cards for each of the user's followers
-    const followersURL = response.data.followers_url;
-    return axios.get(followersURL);
-  })
-  .then(followersResponse => {
-    const cardsDiv = document.querySelector('.cards');
-    createAndAppendFollowerCards(followersResponse, cardsDiv, ghBaseAPIURL);
-  })
-  .catch(err => {
-    console.log("Error:", err);
+      // Get cards for each of the user's followers
+      const followersURL = response.data.followers_url;
+      return axios.get(followersURL);
+    })
+    .then(followersResponse => {
+      const cardsDiv = document.querySelector('.cards');
+      createAndAppendFollowerCards(followersResponse, cardsDiv, ghBaseAPIURL);
+    })
+    .catch(err => {
+      console.log("Error:", err);
+    });
+}
+
+function formCreator() {
+  const form = document.createElement('form');
+  form.action = '#';
+  form.method = 'post';
+  form.addEventListener("submit", function(event) {
+    const user = form.elements.userName.value;
+    event.preventDefault();
+
+    githubCards(user)
   });
+
+  const ul = document.createElement('ul');
+  const li = document.createElement('li');
+  const label = document.createElement('label');
+  label.textContent = 'Github Username:';
+  label.form = 'name';
+  label.style.marginRight = '1rem';
+  label.style.textAlign = 'baseline';
+  label.style.fontSize = '2.8rem';
+  const input = document.createElement('input');
+  input.type = 'text';
+  input.id = 'name';
+  input.name = 'userName';
+  input.style.fontSize = '2.8rem';
+  input.style.paddingRight = '1rem';
+  const button = document.createElement('button');
+  button.type = 'submit';
+  button.textContent = 'Get Profile!';
+  button.fontSize = '3.2rem';
+  button.style.marginLeft = '1rem';
+  button.style.fontSize = '2.8rem';
+
+  li.appendChild(label);
+  li.appendChild(input);
+  li.appendChild(button);
+  ul.appendChild(li);
+  form.appendChild(ul);
+
+  form.style.display = 'flex';
+  form.style.justifyContent = 'center';
+
+  return form;
+}
+
+// Add input button
+const container = document.querySelector('.container');
+const cardsDiv = document.querySelector('cards');
+const inputDiv = document.createElement('div');
+inputDiv.style.width = '100%';
+
+const form = formCreator();
+form.style.padding = '1rem 0rem';
+inputDiv.appendChild(form);
+container.insertBefore(inputDiv, cardsDiv);
