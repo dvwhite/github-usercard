@@ -337,7 +337,6 @@ function formCreator() {
   label.textContent = 'Github Username:';
   label.form = 'name';
   label.style.marginRight = '1rem';
-  label.style.textAlign = 'baseline';
   label.style.fontSize = '2.8rem';
   const input = document.createElement('input');
   input.type = 'text';
