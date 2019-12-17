@@ -325,6 +325,7 @@ function formCreator() {
   form.method = 'post';
   form.addEventListener("submit", function(event) {
     const user = form.elements.userName.value;
+    form.elements.userName.value = "";
     event.preventDefault();
 
     githubCards.call(this, user);
@@ -342,12 +343,13 @@ function formCreator() {
   input.type = 'text';
   input.id = 'name';
   input.name = 'userName';
+  input.placeholder = 'Enter the username...';
   input.style.fontSize = '2.8rem';
   input.style.paddingRight = '1rem';
   const button = document.createElement('button');
   button.type = 'submit';
   button.textContent = 'Get Profile!';
-  button.fontSize = '3.2rem';
+  button.fontSize = '2.8rem';
   button.style.marginLeft = '1rem';
   button.style.fontSize = '2.8rem';
 
