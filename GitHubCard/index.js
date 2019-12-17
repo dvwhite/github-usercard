@@ -255,6 +255,17 @@ function createAndAppendFollowerCards(cardsObj, destination, apiURL) {
 }
 
 /*
+* Clear all innerHTML from the node without using .innerHTML
+* @param {object} element: The element to be cleared
+* @returns: none
+*/
+function clearElement(element) {
+  while(element.firstChild){
+      element.removeChild(element.firstChild);
+  }
+}
+
+/*
 * Get GitHub user data using the GitHub API
 * @param {string} apiURL: The github api URL
 */
@@ -292,6 +303,7 @@ function githubCards(initialUser) {
       // Add profile card for the user
       const cardData = response.data;
       const cardsDiv = document.querySelector('.cards');
+      clearElement(cardsDiv);
       createAndAppendCard(cardData, cardsDiv, ghAPIURL);
 
       // Get cards for each of the user's followers
@@ -339,23 +351,24 @@ function formCreator() {
   button.style.marginLeft = '1rem';
   button.style.fontSize = '2.8rem';
 
+  form.style.display = 'flex';
+  form.style.justifyContent = 'center';
+
   li.appendChild(label);
   li.appendChild(input);
   li.appendChild(button);
   ul.appendChild(li);
   form.appendChild(ul);
 
-  form.style.display = 'flex';
-  form.style.justifyContent = 'center';
-
   return form;
 }
 
 // Add input button
 const container = document.querySelector('.container');
-const cardsDiv = document.querySelector('cards');
+const cardsDiv = document.querySelector('.cards');
 const inputDiv = document.createElement('div');
 inputDiv.style.width = '100%';
+inputDiv.style.paddingBottom = '1.5rem';
 
 const form = formCreator();
 form.style.padding = '1rem 0rem';
